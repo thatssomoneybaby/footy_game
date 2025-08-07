@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏈 AFL Manager</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏈 AFL Manager</h1>
+            <p>Browser-Based Australian Football League Simulation</p>
+        </header>
+
+        <nav>
+            <button onclick="showAFLLadder()" class="nav-btn">AFL Ladder</button>
+            <button onclick="showVFLLadder()" class="nav-btn">VFL Ladder</button>
+            <button onclick="simulateAFLRound()" class="nav-btn">Simulate AFL Round</button>
+            <button onclick="simulateVFLRound()" class="nav-btn">Simulate VFL Round</button>
+            <button onclick="showClubs()" class="nav-btn">Clubs</button>
+            <button onclick="showSeasonStatus()" class="nav-btn">Season Status</button>
+            <button onclick="resetGame()" class="nav-btn reset-btn">🔄 New Season</button>
+        </nav>
+
+        <main id="main-content">
+            <div class="welcome-message">
+                <h2>Welcome to AFL Manager!</h2>
+                <p>Choose an option from the navigation above to start managing your AFL/VFL season.</p>
+                
+                <div class="quick-actions">
+                    <h3>Quick Actions:</h3>
+                    <button onclick="showAFLLadder()" class="action-btn">📊 View AFL Ladder</button>
+                    <button onclick="simulateAFLRound()" class="action-btn">⚽ Simulate Next AFL Round</button>
+                    <button onclick="showSeasonStatus()" class="action-btn">📋 Season Status</button>
+                </div>
+            </div>
+        </main>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <footer>
+            <p>AFL Manager • Browser Edition • <a href="/docs" target="_blank">API Docs</a></p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
