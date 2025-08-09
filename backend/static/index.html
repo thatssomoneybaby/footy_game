@@ -8,34 +8,89 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🏈 AFL Manager</h1>
-            <p>Browser-Based Australian Football League Simulation</p>
-        </header>
+        <!-- Team Selection Screen -->
+        <div id="team-selection" class="screen">
+            <header class="selection-header">
+                <h1>🏈 AFL Manager</h1>
+                <p>Choose Your Team</p>
+            </header>
 
-        <nav>
-            <button onclick="showAFLLadder()" class="nav-btn">AFL Ladder</button>
-            <button onclick="showVFLLadder()" class="nav-btn">VFL Ladder</button>
-            <button onclick="simulateAFLRound()" class="nav-btn">Simulate AFL Round</button>
-            <button onclick="simulateVFLRound()" class="nav-btn">Simulate VFL Round</button>
-            <button onclick="showClubs()" class="nav-btn">Clubs</button>
-            <button onclick="showSeasonStatus()" class="nav-btn">Season Status</button>
-            <button onclick="resetGame()" class="nav-btn reset-btn">🔄 New Season</button>
-        </nav>
-
-        <main id="main-content">
-            <div class="welcome-message">
-                <h2>Welcome to AFL Manager!</h2>
-                <p>Choose an option from the navigation above to start managing your AFL/VFL season.</p>
+            <div class="team-selection-content">
+                <h2>Which league do you want to manage in?</h2>
                 
-                <div class="quick-actions">
-                    <h3>Quick Actions:</h3>
-                    <button onclick="showAFLLadder()" class="action-btn">📊 View AFL Ladder</button>
-                    <button onclick="simulateAFLRound()" class="action-btn">⚽ Simulate Next AFL Round</button>
-                    <button onclick="showSeasonStatus()" class="action-btn">📋 Season Status</button>
+                <div class="league-selector">
+                    <button onclick="showTeams('afl')" class="league-btn afl-btn">
+                        <span class="league-icon">🏆</span>
+                        <span class="league-name">AFL</span>
+                        <span class="league-desc">Australian Football League</span>
+                    </button>
+                    
+                    <button onclick="showTeams('vfl')" class="league-btn vfl-btn">
+                        <span class="league-icon">🥈</span>
+                        <span class="league-name">VFL</span>
+                        <span class="league-desc">Victorian Football League</span>
+                    </button>
+                </div>
+
+                <div id="team-grid" class="team-grid hidden">
+                    <!-- Teams will be populated here -->
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Team Dashboard Screen -->
+        <div id="team-dashboard" class="screen hidden">
+            <header class="dashboard-header">
+                <div class="team-info">
+                    <h1 id="team-name">Team Name</h1>
+                    <p id="team-league">League</p>
+                </div>
+                <div class="dashboard-nav">
+                    <button onclick="changeTeam()" class="nav-btn secondary">Change Team</button>
+                    <button onclick="resetGame()" class="nav-btn reset-btn">🔄 New Season</button>
+                </div>
+            </header>
+
+            <main class="dashboard-main">
+                <div class="dashboard-tiles">
+                    <!-- League Ladder Tile -->
+                    <div class="tile ladder-tile">
+                        <h3>League Ladder</h3>
+                        <div id="ladder-content">
+                            <div class="loading-placeholder">Loading ladder...</div>
+                        </div>
+                        <button onclick="viewFullLadder()" class="tile-btn">View Full Ladder</button>
+                    </div>
+
+                    <!-- Next Match Tile -->
+                    <div class="tile match-tile">
+                        <h3>Next Match</h3>
+                        <div id="next-match-content">
+                            <div class="loading-placeholder">Loading next match...</div>
+                        </div>
+                        <button id="sim-match-btn" onclick="simulateNextMatch()" class="tile-btn primary">Simulate Match</button>
+                    </div>
+
+                    <!-- Team Roster Tile -->
+                    <div class="tile roster-tile">
+                        <h3>Team Roster</h3>
+                        <div id="roster-content">
+                            <div class="loading-placeholder">Loading roster...</div>
+                        </div>
+                        <button onclick="viewFullRoster()" class="tile-btn">View Full Roster</button>
+                    </div>
+
+                    <!-- Season Progress Tile -->
+                    <div class="tile progress-tile">
+                        <h3>Season Progress</h3>
+                        <div id="season-progress-content">
+                            <div class="loading-placeholder">Loading season info...</div>
+                        </div>
+                        <button onclick="simulateToEndOfSeason()" class="tile-btn">Simulate to End</button>
+                    </div>
+                </div>
+            </main>
+        </div>
 
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
@@ -43,7 +98,7 @@
         </div>
 
         <footer>
-            <p>AFL Manager • Browser Edition • <a href="/docs" target="_blank">API Docs</a></p>
+            <p>AFL Manager • Team Manager Edition</p>
         </footer>
     </div>
 

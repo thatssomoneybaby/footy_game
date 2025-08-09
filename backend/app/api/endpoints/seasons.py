@@ -43,21 +43,67 @@ async def get_season(
 @router.get("/{season_id}/fixtures")
 async def get_season_fixtures(
     season_id: int,
-    round_num: int = None,
+    round: int = None,
     session: Session = Depends(get_session)
 ):
     """Get fixtures for a season, optionally filtered by round."""
+    from app.db.models import Club
+    
     season = session.get(Season, season_id)
     if not season:
         raise HTTPException(status_code=404, detail="Season not found")
     
     query = select(Fixture).where(Fixture.season_id == season_id)
     
-    if round_num is not None:
-        query = query.where(Fixture.round == round_num)
+    if round is not None:
+        query = query.where(Fixture.round == round)
     
     fixtures = session.exec(query).all()
-    return fixtures
+    
+    # Enrich fixtures with club information
+    enriched_fixtures = []
+    for fixture in fixtures:
+        home_club = session.get(Club, fixture.home_id)
+        away_club = session.get(Club, fixture.away_id)
+        
+        enriched_fixture = {
+            "id": fixture.id,
+            "season_id": fixture.season_id,
+            "round": fixture.round,
+            "home_club": {
+                "id": home_club.id,
+                "name": home_club.name,
+                "nickname": home_club.nickname,
+                "primary_colour": home_club.primary_colour,
+                "secondary_colour": home_club.secondary_colour,
+                "tier": home_club.tier
+            },
+            "away_club": {
+                "id": away_club.id,
+                "name": away_club.name,
+                "nickname": away_club.nickname,
+                "primary_colour": away_club.primary_colour,
+                "secondary_colour": away_club.secondary_colour,
+                "tier": away_club.tier
+            },
+            "played": fixture.played,
+            "home_score": fixture.home_score,
+            "away_score": fixture.away_score,
+            "home_goals": fixture.home_goals,
+            "home_behinds": fixture.home_behinds,
+            "away_goals": fixture.away_goals,
+            "away_behinds": fixture.away_behinds,
+            "scheduled_date": fixture.scheduled_date,
+            "played_at": fixture.played_at
+        }
+        enriched_fixtures.append(enriched_fixture)
+    
+    return {
+        "season_id": season_id,
+        "round": round,
+        "fixtures_count": len(enriched_fixtures),
+        "fixtures": enriched_fixtures
+    }
 
 
 @router.get("/{season_id}/ladder")
