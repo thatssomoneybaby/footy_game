@@ -445,7 +445,7 @@ function displayFullLadder(ladder) {
     html += `
                 </tbody>
             </table>
-            <button onclick="loadDashboardContent()" class="tile-btn">Back to Dashboard</button>
+            <button onclick="returnToDashboard()" class="tile-btn">Back to Dashboard</button>
         </div>
     `;
     
@@ -508,12 +508,44 @@ function displayFullRoster(players) {
     html += `
                 </tbody>
             </table>
-            <button onclick="loadDashboardContent()" class="tile-btn">Back to Dashboard</button>
+            <button onclick="returnToDashboard()" class="tile-btn">Back to Dashboard</button>
         </div>
     `;
     
     // Replace dashboard with full roster view
     document.querySelector('.dashboard-tiles').innerHTML = html;
+}
+
+function returnToDashboard() {
+    // Restore the original dashboard tile structure
+    const dashboardHTML = `
+        <div class="tile" id="ladder-tile">
+            <h3>Current Ladder</h3>
+            <div id="ladder-content">Loading...</div>
+            <button onclick="viewFullLadder()" class="tile-btn">View Full Ladder</button>
+        </div>
+        
+        <div class="tile" id="next-match-tile">
+            <h3>Next Match</h3>
+            <div id="next-match-content">Loading...</div>
+            <button onclick="simulateNextMatch()" class="tile-btn">Simulate Round</button>
+        </div>
+        
+        <div class="tile" id="roster-tile">
+            <h3>Your Roster</h3>
+            <div id="roster-content">Loading...</div>
+            <button onclick="viewFullRoster()" class="tile-btn">View Full Roster</button>
+        </div>
+        
+        <div class="tile" id="season-progress-tile">
+            <h3>Season Progress</h3>
+            <div id="season-progress-content">Loading...</div>
+            <button onclick="simulateToEndOfSeason()" class="tile-btn">Simulate Season</button>
+        </div>
+    `;
+    
+    document.querySelector('.dashboard-tiles').innerHTML = dashboardHTML;
+    loadDashboardContent();
 }
 
 async function simulateToEndOfSeason() {
