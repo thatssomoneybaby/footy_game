@@ -9,7 +9,7 @@ from app.db.models import Club
 router = APIRouter()
 
 
-@router.get("/", response_model=List[Club])
+@router.get("/")
 async def get_clubs(
     tier: int = None,
     session: Session = Depends(get_session)
@@ -20,7 +20,11 @@ async def get_clubs(
         query = query.where(Club.tier == tier)
     
     clubs = session.exec(query).all()
-    return clubs
+    
+    return {
+        "clubs": clubs,
+        "total": len(clubs)
+    }
 
 
 @router.get("/{club_id}", response_model=Club)

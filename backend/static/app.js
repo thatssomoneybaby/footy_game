@@ -60,7 +60,7 @@ function showDashboard() {
 async function showTeams(league) {
     try {
         showLoading();
-        const clubsData = await apiRequest('/clubs');
+        const clubsData = await apiRequest('/clubs/');
         
         if (!clubsData.clubs) {
             showError('Could not load teams');
