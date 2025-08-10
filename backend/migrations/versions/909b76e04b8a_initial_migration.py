@@ -95,7 +95,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_player_name'), 'player', ['name'], unique=False)
     op.create_table('userprofile',
-    sa.Column('id', sqlmodel.sql.sqltypes.GUID(), nullable=False),
+    sa.Column('id', sa.String(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('username', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('hashed_password', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -134,7 +134,7 @@ def upgrade() -> None:
     )
     op.create_table('save',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sqlmodel.sql.sqltypes.GUID(), nullable=False),
+    sa.Column('user_id', sa.String(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('blob', sa.LargeBinary(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),

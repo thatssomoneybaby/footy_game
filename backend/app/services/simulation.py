@@ -4,33 +4,42 @@ from typing import Dict, Any, List
 from sqlmodel import Session, select
 
 from app.db.models import Club, Fixture, Season, MatchStat, GOAL_POINTS, BEHIND_POINTS
+from app.services.advanced_simulation import AdvancedSimulationEngine, MatchConditions
 
 
 class SimulationService:
     def __init__(self, session: Session):
         self.session = session
+        self.advanced_engine = AdvancedSimulationEngine(session)
 
     def simulate_match(self, home_club: Club, away_club: Club) -> Dict[str, Any]:
-        """Simulate a single match between two clubs."""
-        # Basic simulation - replace with more sophisticated engine later
-        home_goals = random.randint(8, 18)
-        home_behinds = random.randint(6, 15)
-        away_goals = random.randint(8, 18)
-        away_behinds = random.randint(6, 15)
+        """Simulate a single match between two clubs using advanced engine."""
         
-        home_score = (home_goals * GOAL_POINTS) + (home_behinds * BEHIND_POINTS)
-        away_score = (away_goals * GOAL_POINTS) + (away_behinds * BEHIND_POINTS)
+        # Randomly select match conditions to add variety
+        conditions = random.choices(
+            list(MatchConditions), 
+            weights=[0.6, 0.15, 0.15, 0.05, 0.05],  # Perfect weather most common
+            k=1
+        )[0]
         
+        # Use advanced simulation engine
+        detailed_result = self.advanced_engine.simulate_match(home_club, away_club, conditions)
+        
+        # Extract basic result format for compatibility
         result = {
-            "home_club": home_club.name,
-            "away_club": away_club.name,
-            "home_score": home_score,
-            "away_score": away_score,
-            "home_goals": home_goals,
-            "home_behinds": home_behinds,
-            "away_goals": away_goals,
-            "away_behinds": away_behinds,
-            "winner": home_club.name if home_score > away_score else away_club.name if away_score > home_score else "Draw"
+            "home_club": detailed_result["home_club"],
+            "away_club": detailed_result["away_club"],
+            "home_score": detailed_result["home_score"],
+            "away_score": detailed_result["away_score"],
+            "home_goals": detailed_result["home_goals"],
+            "home_behinds": detailed_result["home_behinds"],
+            "away_goals": detailed_result["away_goals"],
+            "away_behinds": detailed_result["away_behinds"],
+            "winner": detailed_result["winner"],
+            "margin": detailed_result["margin"],
+            "conditions": detailed_result["conditions"],
+            "quarters": detailed_result["quarters"],
+            "match_summary": detailed_result["match_summary"]
         }
         
         return result

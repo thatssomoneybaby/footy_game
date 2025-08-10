@@ -12,6 +12,8 @@ from sqlmodel import Session, select
 from app.core.config import settings
 from app.db.database import engine
 from app.db.models import Club, Player, Season, Position
+from app.services.player_generator import PlayerGenerator
+from app.services.fixture_generator import FixtureGenerator
 
 
 # AFL Club data
@@ -57,45 +59,11 @@ LAST_NAMES = [
 ]
 
 
+# Legacy function - now uses enhanced PlayerGenerator
 def generate_random_player(club_id: int) -> Player:
-    """Generate a random player for a club."""
-    first_name = random.choice(FIRST_NAMES)
-    last_name = random.choice(LAST_NAMES)
-    
-    # Generate realistic age distribution
-    age = random.choices(
-        range(18, 35),
-        weights=[1, 2, 3, 4, 5, 5, 4, 3, 3, 2, 2, 1, 1, 1, 1, 1, 1],
-        k=1
-    )[0]
-    
-    # Generate attributes based on age (younger players have more potential)
-    base_skill = random.randint(40, 85)
-    age_factor = max(0.7, 1.0 - (age - 22) * 0.02)  # Peak around 22-25
-    
-    return Player(
-        club_id=club_id,
-        name=f"{first_name} {last_name}",
-        position=random.choice(list(Position)),
-        age=age,
-        # Technical attributes
-        kicking=max(20, min(100, int(base_skill + random.randint(-15, 15)))),
-        handball=max(20, min(100, int(base_skill + random.randint(-15, 15)))),
-        marking=max(20, min(100, int(base_skill + random.randint(-15, 15)))),
-        spoiling=max(20, min(100, int(base_skill + random.randint(-15, 15)))),
-        ruck_work=max(20, min(100, int(base_skill + random.randint(-20, 10)))),
-        # Physical attributes
-        speed=max(20, min(100, int((base_skill * age_factor) + random.randint(-15, 15)))),
-        endurance=max(20, min(100, int((base_skill * age_factor) + random.randint(-15, 15)))),
-        strength=max(20, min(100, int(base_skill + random.randint(-15, 15)))),
-        # Mental attributes
-        decision_making=max(20, min(100, int(base_skill + (age - 18) * 2 + random.randint(-10, 10)))),
-        leadership=max(20, min(100, int(base_skill + (age - 18) * 3 + random.randint(-15, 5)))),
-        composure=max(20, min(100, int(base_skill + (age - 18) * 2 + random.randint(-10, 10)))),
-        # Hidden attributes
-        potential=random.randint(max(50, base_skill - 10), min(100, base_skill + 20)),
-        morale=random.randint(-2, 3),
-    )
+    """Generate a random player for a club using enhanced generator."""
+    generator = PlayerGenerator()
+    return generator.generate_player(club_id)
 
 
 def seed_database():
@@ -139,17 +107,20 @@ def seed_database():
         
         session.commit()
         
-        # Generate players for each club
-        print("👥 Generating players...")
+        # Generate players for each club using enhanced system
+        print("👥 Generating realistic player rosters...")
         all_clubs = afl_clubs + vfl_clubs
+        generator = PlayerGenerator()
         
         for club in all_clubs:
-            # Generate 25-35 players per club
-            num_players = random.randint(25, 35)
-            print(f"  - Creating {num_players} players for {club.name}")
+            # Generate balanced roster with proper position distribution
+            roster_size = random.randint(28, 35)  # Realistic squad sizes
+            print(f"  - Creating {roster_size} players for {club.name}")
             
-            for _ in range(num_players):
-                player = generate_random_player(club.id)
+            # Use enhanced balanced roster generation
+            players = generator.generate_balanced_roster(club.id, roster_size)
+            
+            for player in players:
                 session.add(player)
         
         # Create current season
@@ -178,11 +149,29 @@ def seed_database():
         
         session.commit()
         
+        # Generate fixtures for both seasons
+        print("🗓️  Generating season fixtures...")
+        fixture_generator = FixtureGenerator(session)
+        
+        # Generate AFL fixtures
+        afl_fixtures = fixture_generator.generate_season_fixtures(afl_season.id)
+        print(f"   - Generated {len(afl_fixtures)} AFL fixtures")
+        
+        # Generate VFL fixtures
+        vfl_fixtures = fixture_generator.generate_season_fixtures(vfl_season.id)
+        print(f"   - Generated {len(vfl_fixtures)} VFL fixtures")
+        
+        # Save fixtures to database
+        for fixture in afl_fixtures + vfl_fixtures:
+            session.add(fixture)
+            
+        session.commit()
+        
         print("✅ Database seeding completed successfully!")
         print(f"   - Created {len(AFL_CLUBS)} AFL clubs")
         print(f"   - Created {len(VFL_CLUBS)} VFL clubs")
-        print("   - Generated players for all clubs")
-        print("   - Created current season fixtures")
+        print("   - Generated realistic player rosters with proper distributions")
+        print("   - Created current season fixtures with proper scheduling")
 
 
 if __name__ == "__main__":
